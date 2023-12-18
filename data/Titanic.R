@@ -1,0 +1,346 @@
+library(ggplot2)
+
+test=read.csv("test.csv",header = TRUE)
+train=read.csv("train.csv",header=TRUE)
+
+test.survived <- data.frame(Survived = rep("None", nrow(test)), test[,]) 
+data.combined=rbind(train,test.survived)
+str(data.combined)
+
+data.combined$Pclass=as.factor(data.combined$Pclass) 
+data.combined$Survived=as.factor(data.combined$Survived)
+
+table(data.combined$Survived)
+table(data.combined$Pclass)
+
+train$Pclass=as.factor(train$Pclass)
+ggplot(train, aes(x=as.factor(train$Pclass), fill=factor(Survived))) +
+  geom_bar(aes(y = ..count..))+
+xlab("Pclass") +
+ylab("Total no of people") +
+labs(fill="Survived")
+
+head(as.character(train$Name))
+
+
+length((as.character(data.combined$Name)))
+
+dup.names=as.character(data.combined[which(duplicated(as.character(data.combined$Name))), "Name"])
+data.combined[which(data.combined$Name%in%dup.names),]
+
+
+
+library(stringr)
+
+misses=data.combined[which(str_detect(data.combined$Name,"Miss.")),]
+misses[1:5,]
+
+
+mrs=data.combined[which(str_detect(data.combined$Name,"Mrs.")),]
+mrs[1:5,]
+
+
+males=data.combined[which(train$Sex=="male"),]
+males[1:5,]
+
+
+
+
+extraxtTitle=function(Name)
+{
+  Name=as.character(Name)
+
+if(length(grep("Master.",Name))>0)
+    {
+  return("Master")
+    }
+ else if(length(grep("Miss.",Name))>0)
+    {
+   return("Miss")
+    }
+  else if(length(grep("Mrs.",Name))>0)
+    { 
+    return("Mrs")
+    }
+    else if(length(grep("Mr.",Name))>0)
+    {
+      return("Mr")
+    }
+      else
+    {
+    return("Others")
+    }
+}
+
+titles=NULL
+
+
+
+for (i in 1:nrow(data.combined)) 
+  {
+  titles=c(titles,extraxtTitle(data.combined[i,"Name"]))
+  
+  }
+data.combined$title=as.factor(titles)
+
+#data.combined$title <- as.numeric(data.combined$title)
+
+
+ggplot(data.combined[1:891,],aes(x=title,fill=Survived))+
+stat_count(width =0.5)+
+  
+facet_wrap(~Pclass)+
+ggtitle("Pclass")+
+xlab("Title")+
+ylab("Total Count")+
+labs(fill="Survived")
+
+ggplot(data.combined[1:891,],aes(x=Sex,fill=Survived))+
+  stat_count(width =0.5)+
+  
+  facet_wrap(~Pclass)+
+  ggtitle("Pclass")+
+  xlab("Title")+
+  ylab("Total Count")+
+  labs(fill="Survived")
+
+
+#second
+summary(data.combined$Age)
+ggplot(data.combined[1:891,],aes(x=Age,fill=Survived))+
+                                  stat_count(width =0.5)+
+facet_wrap(~Pclass)+
+ggtitle("Pclass")+
+xlab("Title")+
+ylab("Total Count")+
+labs(fill="Survived")
+
+ggplot(data.combined[1:891,],aes(x=Sex,fill=Survived))+
+  stat_count(width =0.5)+
+  
+  facet_wrap(~Sex + Pclass)+
+  #ggtitle("Pclass")+
+  xlab("Age")+
+  ylab("Total Count")
+  labs(fill="Survived")
+  
+  boys=data.combined[which(data.combined$title=="Master"),]
+  summary(boys$Age)
+  
+  
+  miss=data.combined[which(data.combined$title=="Miss"),]
+  summary(miss$Age)
+  
+ 
+  ggplot(miss[miss$Survived!="None",],aes(x=Age,fill=Survived))+
+    geom_histogram(binwidth = 5)+
+    facet_wrap(~Pclass)+
+    ggtitle("Miss_plot")+
+    xlab("Total_count")+
+    ylab("Age")
+        
+  ggplot(miss[miss$Survived!="None",],aes(x=Age,fill=Survived))+
+    geom_bar(width = 5)+
+    facet_wrap(~Pclass)+
+    ggtitle("Miss_plot")+
+    xlab("Total_count")+
+    ylab("Age")
+  
+  
+  miss.alone=miss[which(miss$SibSp==0 & miss$Parch==0),]
+  length(which(miss.alone$Age<=14.5))
+  
+  ggplot(miss.alone[miss.alone$Survived!="None",],aes(x=Age,fill=Survived))+
+    geom_bar(width = 5)+
+    facet_wrap(~Pclass)+
+    ggtitle("Miss_alone_plot")+
+    xlab("Total_count")+
+    ylab("Age")
+  
+  mr=data.combined[which(data.combined$title=="Mr"),]
+  summary(mr$Age)
+    
+  mr.alone=mr[which(mr$SibSp==0 & mr$Parch==0),]
+  length(mr.alone[which(mr$Age<14.5),])
+  
+  ggplot(mr.alone[mr.alone$Survived!="None",],aes(x=Age,fill=Survived))+
+    geom_bar(width = 5)+
+    facet_wrap(~Pclass)+
+    ggtitle("Mr_alone_plot")+
+    xlab("Total_count")+
+    ylab("Age")
+  
+  data.combined$SibSp=as.factor(data.combined$SibSp)
+  
+  ggplot(data.combined[1:891,],aes(x=SibSp,fill=Survived))+
+    stat_count(width =1)+
+    
+    facet_wrap(~title + Pclass)+
+    ggtitle("Pclass_sibsp")+
+    xlab("Sibsp")+
+    ylab("Total Count")+
+    ylim(0,300)
+  labs(fill="Survived")
+  
+  data.combined$Parch=as.factor(data.combined$Parch)
+  ggplot(data.combined[1:891,],aes(x=Parch,fill=Survived))+
+    stat_count(width =1)+
+    
+    facet_wrap(~title + Pclass)+
+    ggtitle("Pclass_sibsp")+
+    xlab("Sibsp")+
+    ylab("Total Count")+?
+    ylim(0,300)
+  labs(fill="Survived")
+  
+  #data_featuring
+  temp.sibsp=c(train$SibSp,test$SibSp)
+  temp.parch=c(train$Parch,test$Parch)
+  
+  data.combined$family.size=as.factor(temp.parch+temp.sibsp+1)
+  
+#TAKE A LOOK AT TICKET
+  str(data.combined$Ticket)
+  data.combined$Ticket=as.character(data.combined$Ticket)
+  
+  
+data.combined$Ticket[1:20]
+
+
+#trying to get the first letter of ticket data
+ticket.first.char=ifelse(data.combined$Ticket==""," ",substr(data.combined$Ticket,1,1))
+length((ticket.first.char))
+unique(ticket.first.char)
+
+#for visualization we convert it into factor
+ticket.first.char=as.factor(ticket.first.char)
+
+#add that to the table
+data.combined$ticket.first.char=ticket.first.char
+
+#now visualise the datA with ticket as the data and give the survavibality on the basis of first letter of ticket
+#ggplot(data.combined[1:891,],aes(x=Parch,fill=Survived))+
+ggplot(data.combined[1:891,], aes(x=ticket.first.char,fill=Survived))+
+  #stat_count(width = 1)+
+  geom_bar()+
+  facet_wrap(~Pclass)+
+  ggtitle("ticket_first_letter")+
+  xlab("Ticket_1_letter")+
+  ylab("Total Count")+
+  ylim(0,350)
+labs(fill="Survived")
+
+
+#lets look for a pattern with ticket and class+title
+
+ggplot(data.combined[1:891,], aes(x=ticket.first.char,fill=Survived))+
+  #stat_count(width = 1)+
+  geom_bar()+
+  facet_wrap(~Pclass+title)+
+  ggtitle("ticket_first_letter")+
+  xlab("Ticket_1_letter")+
+  ylab("Total Count")+
+  ylim(0,350)
+labs(fill="Survived")
+
+
+#factors with more than 32 levels wont work n defacto algorithm...so convert those to character or numeric
+
+data.combined$Cabin=as.character(data.combined$Cabin)
+data.combined$Cabin[1:100]
+
+#replace missing cabin with U
+
+data.combined[which(data.combined$Cabin ==" "), "Cabin"]="U"
+data.combined[is.na(data.combined)]="U"
+
+
+#talke the first letter
+cabin.first.char=as.factor(substr(data.combined$Cabin,1,1))
+data.combined$cabin.first.char=as.factor(cabin.first.char)
+
+#lets look for a pattern with ticket and class+title
+ggplot(data.combined[1:891,], aes(x=cabin.first.char,fill=Survived))+
+  #stat_count(width = 1)+
+  geom_bar()+
+  facet_wrap(~Pclass+title)+
+  ggtitle("cabin_first_letter")+
+  xlab("cabin_1_letter")+
+  ylab("Total Count")+
+  ylim(0,350)
+labs(fill="Survived")
+
+#multiple_cabins....
+data.combined$cabin.mult=as.factor(ifelse(str_detect(data.combined$Cabin," "),"Y","N"))
+
+ggplot(data.combined[1:891,], aes(x=cabin.mult,fill=Survived))+
+  #stat_count(width = 1)+
+  geom_bar()+
+  facet_wrap(~Pclass+title)+
+  ggtitle("cabin_first_letter")+
+  xlab("cabin_1_letter")+
+  ylab("Total Count")+
+  ylim(0,350)
+labs(fill="Survived")
+
+#####################################################################################
+
+##Random forest modelling
+install.packages("randomForest")
+library(randomForest)
+#####################################################################################
+
+
+rf.1=data.combined[1:891,c("Pclass","title")]
+rf.res=as.factor(train$Survived)
+
+set.seed(1234)
+rf.test.1=randomForest(x=rf.1,y=rf.res,importance=TRUE,ntree = 1000)
+rf.test.1
+varImpPlot(rf.test.1)
+
+
+#considering siblings along
+set.seed(1234)
+rf.2=data.combined[1:891,c("Pclass","title","SibSp")]
+rf.test.2=randomForest(x=rf.2,y=rf.res,importance=TRUE,ntree = 1000)
+rf.test.2
+varImpPlot(rf.test.2)
+
+
+#considering parch along
+set.seed(1234)
+rf.3=data.combined[1:891,c("Pclass","title","Parch")]
+rf.test.3=randomForest(x=rf.3,y=rf.res,importance=TRUE,ntree = 1000)
+rf.test.3
+varImpPlot(rf.test.3)
+
+
+#considering sibsp along with family.size
+set.seed(1234)
+rf.5=data.combined[1:891,c("Pclass","title","SibSp","family.size")]
+rf.test.5=randomForest(x=rf.5,y=rf.res,importance=TRUE,ntree = 1000)
+rf.test.5
+varImpPlot(rf.test.5)
+
+
+#considering parch along family size
+set.seed(1234)
+rf.6=data.combined[1:891,c("Pclass","title","SibSp","family.size")]
+rf.test.6=randomForest(x=rf.6,y=rf.res,importance=TRUE,ntree = 1000)
+rf.test.6
+varImpPlot(rf.test.6)
+
+
+#considering parch,sibsp and famli.size together
+set.seed(1234)
+rf.7=data.combined[1:891,c("Pclass","title","SibSp","family.size")]
+rf.test.7=randomForest(x=rf.7,y=rf.res,importance=TRUE,ntree = 1000)
+rf.test.7
+varImpPlot(rf.test.7)
+
+
+##CROSS VALIDATION WITH THE DATA WE HAVE####
+
+
+

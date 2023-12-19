@@ -2,4 +2,4 @@
 
 Plots - codul in R
 data - prezentarea
-raport - cercetarea in pdf
+raport - cercetarea in docx
